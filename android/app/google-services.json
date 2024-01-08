@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "476322931060",
+    "project_id": "competitive-chatting",
+    "storage_bucket": "competitive-chatting.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:476322931060:android:e55a73ce1916e317be8c21",
+        "android_client_info": {
+          "package_name": "com.example.competitive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChjmtcKwSD-d1DsFXwiNMDxu0N8ACnEE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
