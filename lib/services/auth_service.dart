@@ -34,8 +34,8 @@ Future<UserCredential>signInWithEmailandPassword(
 }
 
 //create new user
-  Future<UserCredential> singUpWithEmailandPassword(
-      String email, password) async {
+  Future<UserCredential> singUpWithEmailAndPassword(
+      String email,String password,String fullName) async {
   try{
     UserCredential userCredential =
     await _firebaseAuth.createUserWithEmailAndPassword(
@@ -47,9 +47,8 @@ Future<UserCredential>signInWithEmailandPassword(
     _fireStore.collection('users').doc(userCredential.user!.uid).set({
       'uid' : userCredential.user!.uid,
       'email' : email,
+      'fullName' : fullName,
     });
-    
-
     return userCredential;
     } on FirebaseAuthException catch(e){
     throw Exception(e.code);

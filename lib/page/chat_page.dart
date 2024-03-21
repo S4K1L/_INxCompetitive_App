@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 class ChatPage extends StatefulWidget {
   final String receiverUserEmail;
   final String receiverUserID;
+
   const ChatPage({
-    super.key,
+    Key? key,
     required this.receiverUserEmail,
     required this.receiverUserID,
-  });
+  }) : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -24,10 +25,12 @@ class _ChatPageState extends State<ChatPage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   void sendMessage() async {
-    if(_messageController.text.isNotEmpty){
+    if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
-          widget.receiverUserID, _messageController.text);
-      // clear the controller after sending the message
+        widget.receiverUserID,
+        _messageController.text,
+      );
+      // Clear the controller after sending the message
       _messageController.clear();
     }
   }
@@ -40,7 +43,7 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           // Message
           Expanded(
-              child: _buildMessageList()
+            child: _buildMessageList(),
           ),
 
           // User input
@@ -52,33 +55,38 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  //Build Message list
-   Widget _buildMessageList() {
+  // Build Message list
+  Widget _buildMessageList() {
     return StreamBuilder(
-        stream: _chatService.getMessages(
-            widget.receiverUserID, _firebaseAuth.currentUser!.uid),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text('Error${snapshot.error}');
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Loading....');
-          }
-          return ListView(
-            children: snapshot.data!.docs
-                .map((document) => _buildMessageItem(document))
-                .toList(),
-          );
+      stream: _chatService.getMessages(
+        widget.receiverUserID,
+        _firebaseAuth.currentUser?.uid ?? '', // Handle null case
+      ),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
         }
-          );
-      }
 
-  //Build Message item
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text('Loading....');
+        }
+
+        return ListView(
+          children: snapshot.data?.docs
+              .map((document) => _buildMessageItem(document))
+              .toList() ??
+              [], // Handle null case
+        );
+      },
+    );
+  }
+
+  // Build Message item
   Widget _buildMessageItem(DocumentSnapshot document) {
-    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-    //alignment
-    var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid)
+    Map<String, dynamic> data =
+        document.data() as Map<String, dynamic>? ?? {}; // Handle null case
+    // Alignment
+    var alignment = (data['senderId'] == _firebaseAuth.currentUser?.uid)
         ? Alignment.centerRight
         : Alignment.centerLeft;
     return Container(
@@ -86,49 +94,47 @@ class _ChatPageState extends State<ChatPage> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          crossAxisAlignment:
-          (data['senderId'] == _firebaseAuth.currentUser!.uid)
+          crossAxisAlignment: (data['senderId'] == _firebaseAuth.currentUser?.uid)
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
-          mainAxisAlignment:
-          (data['senderId'] == _firebaseAuth.currentUser!.uid)
+          mainAxisAlignment: (data['senderId'] == _firebaseAuth.currentUser?.uid)
               ? MainAxisAlignment.end
               : MainAxisAlignment.start,
           children: [
-            Text(data['senderEmail']),
+            Text(data['senderEmail'] ?? ''), // Handle null case
             const SizedBox(height: 5),
-            ChatBubble(message: data['message']),
+            ChatBubble(message: data['message'] ?? ''), // Handle null case
           ],
         ),
       ),
     );
   }
 
-  //Build Message input
-Widget _buildMessageInput(){
+  // Build Message input
+  Widget _buildMessageInput() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: Row(
         children: [
-          //TextField
+          // TextField
           Expanded(
-              child: MyTextField(
-                controller: _messageController,
-                hintText: 'Enter message',
-                obscureText: false,
-              ),
+            child: MyTextField(
+              controller: _messageController,
+              hintText: 'Enter message',
+              obscureText: false,
+            ),
           ),
 
-          // send button
+          // Send button
           IconButton(
-              onPressed: sendMessage,
-              icon: const Icon(
-                Icons.arrow_circle_right_outlined,
-                size: 40,
-              ),
+            onPressed: sendMessage,
+            icon: const Icon(
+              Icons.arrow_forward_ios,
+              size: 30,
+            ),
           )
         ],
       ),
     );
-}
+  }
 }

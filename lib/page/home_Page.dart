@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:competitive/components/my_button.dart';
 import 'package:competitive/page/chat_page.dart';
 import 'package:competitive/screens/profile_screen.dart';
 import 'package:competitive/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,7 +25,6 @@ class _HomePageState extends State<HomePage> {
   void signOut() {
     //get auth service
     final authService = Provider.of<AuthService>(context, listen: false);
-
     authService.signOut();
   }
 
@@ -31,27 +32,64 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(CupertinoIcons.home),
         centerTitle: true,
         elevation: 2,
-        title: const Text("INIMICAL DON'S"),
+        title: const Text("LEVEL ZERO"),
         actions: [
           //sign out button
           //IconButton(onPressed: signOut, icon: Icon(Icons.logout)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()));
-              },
-              icon: const Icon(Icons.more_vert)),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: FloatingActionButton(
-          onPressed: signOut,
-          child: const Icon(Icons.add_comment_rounded),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            Column(
+              children: [
+                Image.asset('assets/images/sirus.jpg'),
+                SizedBox(
+                  height: 16,
+                ),
+                DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Text(
+                      "SMUCT LEVEL ZERO",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ))
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 380),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 16,
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            signOut();
+                          }, child: Text("Logout")),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
       body: _buildUserList(),
@@ -92,7 +130,7 @@ class _HomePageState extends State<HomePage> {
         child: InkWell(
           child: ListTile(
             leading: const CircleAvatar(child: Icon(CupertinoIcons.person)),
-            title: Text(data['email']),
+            title: Text(data['fullName']),
             onTap: () {
               // pas the clicked user's UID to the chat page
               Navigator.push(
